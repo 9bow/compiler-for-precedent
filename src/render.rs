@@ -339,6 +339,7 @@ pub fn precedent_to_markdown(detail: &PrecedentDetail) -> Result<Vec<u8>> {
             "https://www.law.go.kr/LSW/precInfoP.do?precSeq={}",
             detail.metadata.serial
         ),
+        attachments: Vec::new(),
         judgment_date: format_judgment_date(&detail.metadata.judgment_date),
     };
     let mut yaml = serde_yaml::to_string(&frontmatter)?;
@@ -427,6 +428,9 @@ struct Frontmatter<'a> {
     /// 출처 URL.
     #[serde(rename = "출처")]
     source: String,
+    /// Structured attachment links. PrecService currently has no separate attachment fields.
+    #[serde(rename = "첨부파일")]
+    attachments: Vec<String>,
     /// 선고일자 (`YYYY-MM-DD`), omitted when missing.
     #[serde(rename = "선고일자", skip_serializing_if = "Option::is_none")]
     judgment_date: Option<String>,
@@ -648,6 +652,7 @@ mod tests {
         assert!(markdown.contains("판례일련번호: '145683'"));
         assert!(markdown.contains("법원등급: 대법원"));
         assert!(markdown.contains("2003-11-14"));
+        assert!(markdown.contains("첨부파일: []"));
         assert!(markdown.contains("# 손해배상"));
         assert!(markdown.contains("## 판시사항"));
         assert!(markdown.contains("판시 본문"));
